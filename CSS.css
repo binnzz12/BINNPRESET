@@ -1,0 +1,230 @@
+/* ================================
+   ROOT & RESET
+================================ */
+:root{
+  --primary:#38bdf8;
+  --secondary:#6366f1;
+  --bg:#020617;
+  --glass:rgba(255,255,255,.06);
+  --border:rgba(255,255,255,.12);
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  font-family:Inter,system-ui,sans-serif;
+  color:#e5e7eb;
+  background-color:var(--bg);
+  min-height:100vh;
+  line-height:1.6;
+  overflow-x:hidden;
+}
+
+/* ================================
+   GLOBAL ANIMATION
+================================ */
+*{
+  transition:
+    background .4s ease,
+    color .3s ease,
+    border .3s ease,
+    transform .4s cubic-bezier(.4,0,.2,1),
+    box-shadow .4s ease;
+}
+
+/* ================================
+   TYPOGRAPHY
+================================ */
+h1,h2,h3{
+  font-weight:800;
+  letter-spacing:.3px;
+}
+
+h1{
+  font-size:clamp(2.2rem,6vw,3.6rem);
+}
+
+h2{
+  font-size:clamp(1.4rem,4vw,2rem);
+  margin-bottom:1.2rem;
+}
+
+p{
+  opacity:.85;
+}
+
+/* ================================
+   NAVIGATION
+================================ */
+header{
+  position:sticky;
+  top:0;
+  z-index:100;
+  backdrop-filter:blur(18px);
+  background:linear-gradient(
+    to bottom,
+    rgba(2,6,23,.75),
+    rgba(2,6,23,.4)
+  );
+  border-bottom:1px solid var(--border);
+}
+
+.nav-container{
+  max-width:1200px;
+  margin:auto;
+  padding:1rem 1.2rem;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+nav{
+  display:flex;
+  gap:1.4rem;
+}
+
+nav a{
+  color:#cbd5f5;
+  text-decoration:none;
+  font-weight:600;
+  position:relative;
+}
+
+nav a::after{
+  content:"";
+  position:absolute;
+  left:0;
+  bottom:-4px;
+  width:0;
+  height:2px;
+  background:linear-gradient(90deg,var(--primary),var(--secondary));
+}
+
+nav a:hover::after{
+  width:100%;
+}
+
+/* ================================
+   SECTION
+================================ */
+.section{
+  max-width:1200px;
+  margin:auto;
+  padding:4.5rem 1.2rem;
+}
+
+.hero{
+  min-height:85vh;
+  display:flex;
+  align-items:center;
+}
+
+/* ================================
+   TEMPLATE CARD
+================================ */
+.template-wrapper{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:2rem;
+}
+
+.template{
+  background:
+    linear-gradient(var(--bg),var(--bg)) padding-box,
+    linear-gradient(135deg,var(--primary),var(--secondary)) border-box;
+  border:1px solid transparent;
+  border-radius:24px;
+  padding:1rem;
+  box-shadow:0 40px 100px rgba(0,0,0,.45);
+}
+
+.template:hover{
+  transform:translateY(-6px) scale(1.01);
+  box-shadow:0 60px 140px rgba(0,0,0,.55);
+}
+
+video{
+  width:100%;
+  aspect-ratio:4/5;
+  object-fit:cover;
+  border-radius:18px;
+  background:#000;
+}
+
+#presetLink{
+  display:inline-block;
+  margin-top:1rem;
+  font-weight:700;
+  color:var(--primary);
+  text-decoration:none;
+}
+
+/* ================================
+   CONTACT FORM
+================================ */
+form{
+  max-width:480px;
+  margin:auto;
+  background:rgba(2,6,23,.8);
+  backdrop-filter:blur(20px);
+  padding:2.2rem;
+  border-radius:22px;
+  border:1px solid var(--border);
+}
+
+input,textarea{
+  width:100%;
+  margin-bottom:1.2rem;
+  padding:.8rem 1rem;
+  border-radius:14px;
+  border:1px solid var(--border);
+  background:var(--glass);
+  color:#fff;
+  outline:none;
+}
+
+input:focus,textarea:focus{
+  border-color:var(--primary);
+}
+
+button{
+  width:100%;
+  padding:.9rem;
+  border:none;
+  border-radius:999px;
+  font-weight:800;
+  cursor:pointer;
+  color:#020617;
+  background:linear-gradient(135deg,var(--primary),var(--secondary));
+}
+
+button:hover{
+  filter:brightness(1.1);
+}
+
+/* ================================
+   DEV PANEL
+================================ */
+#devPanel{
+  background:rgba(2,6,23,.92);
+  backdrop-filter:blur(20px);
+  border:1px solid var(--border);
+  border-radius:18px;
+}
+
+/* ================================
+   RESPONSIVE
+================================ */
+@media(min-width:768px){
+  .template-wrapper{
+    grid-template-columns:repeat(2,1fr);
+  }
+}

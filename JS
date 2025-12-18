@@ -1,0 +1,73 @@
+/* =====================================
+   DYNAMIC BACKGROUND UI (JS ONLY)
+===================================== */
+
+/* Inject base background style */
+const bgStyle = document.createElement("style");
+bgStyle.innerHTML = `
+body{
+  background:
+    radial-gradient(circle at 15% 20%, rgba(56,189,248,.18), transparent 40%),
+    radial-gradient(circle at 85% 30%, rgba(99,102,241,.18), transparent 45%),
+    radial-gradient(circle at 50% 80%, rgba(14,165,233,.12), transparent 50%),
+    linear-gradient(180deg,#020617,#020617);
+  position:relative;
+}
+.bg-orb{
+  position:fixed;
+  width:420px;
+  height:420px;
+  border-radius:50%;
+  filter:blur(120px);
+  opacity:.35;
+  z-index:-1;
+  pointer-events:none;
+}
+`;
+document.head.appendChild(bgStyle);
+
+/* Create glow orbs */
+const orb1 = document.createElement("div");
+const orb2 = document.createElement("div");
+
+orb1.className = "bg-orb";
+orb2.className = "bg-orb";
+
+orb1.style.background = "#38bdf8";
+orb2.style.background = "#6366f1";
+
+document.body.appendChild(orb1);
+document.body.appendChild(orb2);
+
+/* Initial position */
+orb1.style.top = "-120px";
+orb1.style.left = "-120px";
+
+orb2.style.bottom = "-140px";
+orb2.style.right = "-140px";
+
+/* Floating animation (JS driven) */
+let t = 0;
+function animateBackground(){
+  t += 0.002;
+
+  orb1.style.transform =
+    `translate(${Math.sin(t)*30}px, ${Math.cos(t)*40}px)`;
+
+  orb2.style.transform =
+    `translate(${Math.cos(t)*35}px, ${Math.sin(t)*30}px)`;
+
+  requestAnimationFrame(animateBackground);
+}
+animateBackground();
+
+/* Subtle parallax on mouse (desktop only) */
+window.addEventListener("mousemove", e => {
+  if (window.innerWidth < 768) return;
+
+  const x = (e.clientX / window.innerWidth - .5) * 40;
+  const y = (e.clientY / window.innerHeight - .5) * 40;
+
+  orb1.style.transform += ` translate(${x}px, ${y}px)`;
+  orb2.style.transform += ` translate(${-x}px, ${-y}px)`;
+});
