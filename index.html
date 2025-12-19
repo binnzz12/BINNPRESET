@@ -78,12 +78,11 @@ body.dev #devPanel{display:block;}
       <a href="#home">Home</a>
       <a href="#template">Template</a>
       <a href="#contact">Contact</a>
-      <a href="https://www.tiktok.com/@presetbinn" target="_blank">TikTok</a>
+      <a href="https://www.tiktok.com/@USERNAME" target="_blank">TikTok</a>
     </nav>
   </div>
 </header>
 
-<!-- HOME -->
 <section id="home" class="section hero">
   <h1>BINNPRESET</h1>
   <p>Creator JJ • Preset • Typography</p>
@@ -95,19 +94,15 @@ body.dev #devPanel{display:block;}
   </div>
 </section>
 
-<!-- TEMPLATE -->
 <section id="template" class="section">
   <h2>Template</h2>
-  <div class="template-wrapper" id="templateWrapper">
-    <!-- Template baru akan otomatis muncul disini lewat Dev Mode -->
-  </div>
+  <div class="template-wrapper" id="templateWrapper"></div>
 </section>
 
-<!-- CONTACT -->
 <section id="contact" class="section">
   <h2>Contact</h2>
   <form action="https://api.web3forms.com/submit" method="POST" id="web3ContactForm">
-    <input type="hidden" name="access_key" value="b8aa83a2-2e0f-4831-bbe8-503e44dbd0bf">
+    <input type="hidden" name="access_key" value="138dc640-da62-406a-8927-1a6dbb3de571">
     <div class="form-group">
       <label for="contactName">Nama</label>
       <input type="text" id="contactName" name="name" placeholder="Masukkan nama" required>
@@ -125,81 +120,77 @@ body.dev #devPanel{display:block;}
   </form>
 </section>
 
-<!-- DEV PANEL -->
 <div id="devPanel">
-  <input type="file" id="devVideo" accept="video/*"><br><br>
+  <input type="url" id="devVideoUrl" placeholder="URL Video"><br><br>
   <input type="text" id="devTitle" placeholder="Nama Template"><br><br>
   <input type="url" id="devLink" placeholder="Link Preset"><br><br>
   <button id="saveEdit">Tambah Template</button>
 </div>
 
 <script>
-/* fade in */
-window.onload=()=>document.body.animate([{opacity:0},{opacity:1}],{duration:800,easing:"ease-out"});
+window.onload=()=>{document.body.animate([{opacity:0},{opacity:1}],{duration:800,easing:"ease-out"}); loadTemplates(); };
+document.querySelectorAll("nav a").forEach(a=>{ a.onclick=e=>{ if(a.hash){ e.preventDefault(); document.querySelector(a.hash).scrollIntoView({behavior:"smooth"}); } }; });
 
-/* smooth scroll */
-document.querySelectorAll("nav a").forEach(a=>{
-  a.onclick=e=>{
-    if(a.hash){ e.preventDefault(); document.querySelector(a.hash).scrollIntoView({behavior:"smooth"}); }
-  };
-});
-
-/* dev mode */
+/* Dev Mode */
 let c=0,t;
 logo.onclick=()=>{
   c++;
   if(c===1) t=setTimeout(()=>c=0,2000);
-  if(c===5){
-    clearTimeout(t); c=0;
-    if(btoa(prompt("Kunci developer"))==="YmlubnByc3Q="){ 
-      localStorage.setItem("DEV","1"); 
-      document.body.classList.add("dev");
-    } else alert("Akses ditolak");
+  if(c===5){ clearTimeout(t); c=0;
+    if(btoa(prompt("Kunci developer"))==="YmlubnByc3Q="){ localStorage.setItem("DEV","1"); document.body.classList.add("dev"); } else alert("Akses ditolak");
   }
 };
-if(localStorage.getItem("DEV"))document.body.classList.add("dev");
+if(localStorage.getItem("DEV")) document.body.classList.add("dev");
 
-/* Dev Mode: tambah template */
+/* Simpan template ke localStorage */
+function saveTemplate(title, videoUrl, presetLink){
+  let templates = JSON.parse(localStorage.getItem("templates")||"[]");
+  templates.push({title, videoUrl, presetLink});
+  localStorage.setItem("templates", JSON.stringify(templates));
+  loadTemplates();
+}
+
+/* Load template dari localStorage */
+function loadTemplates(){
+  let templates = JSON.parse(localStorage.getItem("templates")||"[]");
+  const wrapper = document.getElementById("templateWrapper");
+  wrapper.innerHTML = "";
+  templates.forEach(t=>{
+    const div = document.createElement("div");
+    div.className="template";
+    const video = document.createElement("video");
+    video.src = t.videoUrl;
+    video.controls = true;
+    div.appendChild(video);
+    const titleEl = document.createElement("div");
+    titleEl.className="template-title";
+    titleEl.textContent = t.title;
+    div.appendChild(titleEl);
+    const linkEl = document.createElement("a");
+    linkEl.href = t.presetLink;
+    linkEl.target="_blank";
+    linkEl.textContent="Buka Preset";
+    div.appendChild(linkEl);
+    wrapper.appendChild(div);
+  });
+}
+
+/* Dev add template */
 saveEdit.onclick=()=>{
   if(!confirm("Tambahkan template baru?")) return;
-  const videoFile = devVideo.files[0];
-  const title = devTitle.value.trim();
-  const link = devLink.value.trim();
-  if(!videoFile || !title || !link){ alert("Semua kolom harus diisi!"); return; }
-
-  const wrapper = document.getElementById("templateWrapper");
-
-  const templateDiv = document.createElement("div");
-  templateDiv.className = "template";
-
-  const videoEl = document.createElement("video");
-  videoEl.src = URL.createObjectURL(videoFile);
-  videoEl.controls = true;
-  templateDiv.appendChild(videoEl);
-
-  const titleEl = document.createElement("div");
-  titleEl.className = "template-title";
-  titleEl.textContent = title;
-  templateDiv.appendChild(titleEl);
-
-  const linkEl = document.createElement("a");
-  linkEl.href = link;
-  linkEl.target="_blank";
-  linkEl.textContent="Buka Preset";
-  templateDiv.appendChild(linkEl);
-
-  wrapper.appendChild(templateDiv);
-
-  // reset input
-  devVideo.value = "";
-  devTitle.value = "";
-  devLink.value = "";
+  const url = document.getElementById("devVideoUrl").value.trim();
+  const title = document.getElementById("devTitle").value.trim();
+  const link = document.getElementById("devLink").value.trim();
+  if(!url||!title||!link){ alert("Semua kolom harus diisi!"); return; }
+  saveTemplate(title,url,link);
+  document.getElementById("devVideoUrl").value="";
+  document.getElementById("devTitle").value="";
+  document.getElementById("devLink").value="";
 };
 
 /* Web3Forms submit */
 const web3Form = document.getElementById('web3ContactForm');
 const formResponse = document.getElementById('formResponse');
-
 if(web3Form){
   web3Form.addEventListener('submit', async (e)=>{
     e.preventDefault();
@@ -207,18 +198,9 @@ if(web3Form){
     try{
       const res = await fetch(web3Form.action,{method:"POST",body:formData});
       const data = await res.json();
-      if(data.success){
-        formResponse.textContent = "✅ Pesan berhasil dikirim!";
-        formResponse.style.display = "block";
-        web3Form.reset();
-      } else {
-        formResponse.textContent = "❌ Terjadi kesalahan, coba lagi!";
-        formResponse.style.display = "block";
-      }
-    } catch(err){
-      formResponse.textContent = "❌ Network error, cek koneksi!";
-      formResponse.style.display = "block";
-    }
+      if(data.success){ formResponse.textContent = "✅ Pesan berhasil dikirim!"; formResponse.style.display="block"; web3Form.reset(); } 
+      else { formResponse.textContent = "❌ Terjadi kesalahan, coba lagi!"; formResponse.style.display="block"; }
+    } catch(err){ formResponse.textContent = "❌ Network error, cek koneksi!"; formResponse.style.display="block"; }
   });
 }
 </script>
