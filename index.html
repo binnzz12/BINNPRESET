@@ -14,11 +14,7 @@ body {
   color:#e5e7eb;
   min-height:100vh;
   overflow-x:hidden;
-
-  /* fallback solid color untuk iOS */
   background-color:#020617;
-
-  /* background utama */
   background-image:
     radial-gradient(circle at 15% 20%, rgba(56,189,248,.18), transparent 40%),
     radial-gradient(circle at 85% 30%, rgba(99,102,241,.18), transparent 45%),
@@ -81,20 +77,52 @@ nav a:hover::after { width:100%; }
 .hero .home-description .home-highlight { font-weight:700; color:#38bdf8; margin-top:1rem; }
 
 /* ===== TEMPLATE ===== */
-.template-wrapper { display:grid; grid-template-columns:1fr; gap:2rem; margin-top:2rem; }
+.template-wrapper { 
+  display:grid; 
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); 
+  gap:1.5rem; 
+  margin-top:2rem; 
+}
+
 .template {
   background:linear-gradient(#020617,#020617) padding-box,
              linear-gradient(135deg,#38bdf8,#6366f1) border-box;
   border:1px solid transparent; border-radius:20px; padding:1rem;
-  box-shadow:0 30px 80px rgba(0,0,0,.45);
+  box-shadow:0 20px 50px rgba(0,0,0,.4);
   transition: all .3s ease;
+  display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
 }
+
 .template:hover{
-  transform:translateY(-6px) scale(1.01);
-  box-shadow:0 60px 140px rgba(0,0,0,.55);
+  transform:translateY(-4px) scale(1.02);
+  box-shadow:0 40px 80px rgba(0,0,0,.5);
 }
-video { width:100%; aspect-ratio:4/5; object-fit:cover; border-radius:14px; background:#020617; }
-#presetLink { display:inline-block; margin-top:1rem; font-weight:600; color:#38bdf8; text-decoration:none; }
+
+.template video { 
+  width:100%; 
+  aspect-ratio:4/5; 
+  object-fit:cover; 
+  border-radius:12px; 
+  background:#020617; 
+  margin-bottom:0.5rem;
+}
+
+.template .template-title {
+  font-weight:600;
+  color:#38bdf8;
+  margin-bottom:0.5rem;
+  text-align:center;
+}
+
+.template #presetLink {
+  display:inline-block; 
+  font-weight:500; 
+  color:#e5e7eb; 
+  text-decoration:none; 
+  font-size:0.9rem;
+  transition: all .2s ease;
+}
+.template #presetLink:hover { color:#38bdf8; }
 
 /* ===== CONTACT ===== */
 form {
@@ -133,7 +161,7 @@ body.dev #devPanel { display:block; }
       <a href="#home">Home</a>
       <a href="#template">Template</a>
       <a href="#contact">Contact</a>
-      <a href="https://www.tiktok.com/@presetbinn" target="_blank">TikTok</a>
+      <a href="https://www.tiktok.com/@USERNAME" target="_blank">TikTok</a>
     </nav>
   </div>
 </header>
@@ -158,9 +186,25 @@ body.dev #devPanel { display:block; }
 <section id="template" class="section">
   <h2>Template</h2>
   <div class="template-wrapper">
+    <!-- Contoh template 1 -->
     <div class="template">
-      <video id="previewVideo" controls></video>
-      <a id="presetLink" href="#" target="_blank">Buka Preset</a>
+      <video src="video1.mp4" controls></video>
+      <div class="template-title">Cinematic Drone 1</div>
+      <a id="presetLink" href="https://linkpreset1.com" target="_blank">Buka Preset</a>
+    </div>
+
+    <!-- Contoh template 2 -->
+    <div class="template">
+      <video src="video2.mp4" controls></video>
+      <div class="template-title">JJ Style 2</div>
+      <a id="presetLink" href="https://linkpreset2.com" target="_blank">Buka Preset</a>
+    </div>
+
+    <!-- Contoh template 3 -->
+    <div class="template">
+      <video src="video3.mp4" controls></video>
+      <div class="template-title">Typography 3</div>
+      <a id="presetLink" href="https://linkpreset3.com" target="_blank">Buka Preset</a>
     </div>
   </div>
 </section>
@@ -169,7 +213,7 @@ body.dev #devPanel { display:block; }
 <section id="contact" class="section">
   <h2>Contact</h2>
   <form action="https://api.web3forms.com/submit" method="POST" id="web3ContactForm">
-    <input type="hidden" name="access_key" value="b8aa83a2-2e0f-4831-bbe8-503e44dbd0bf">
+    <input type="hidden" name="access_key" value="138dc640-da62-406a-8927-1a6dbb3de571">
 
     <div class="form-group">
       <label for="contactName">Nama</label>
@@ -228,10 +272,11 @@ if(localStorage.getItem("DEV"))document.body.classList.add("dev");
 saveEdit.onclick=()=>{
   if(!confirm("Simpan perubahan?"))return;
   if(devVideo.files[0]){
-    previewVideo.src=URL.createObjectURL(devVideo.files[0]);
-    previewVideo.load();
+    const lastTemplate = document.querySelector(".template-wrapper .template:last-child video");
+    lastTemplate.src = URL.createObjectURL(devVideo.files[0]);
+    lastTemplate.load();
   }
-  if(devLink.value) presetLink.href=devLink.value;
+  if(devLink.value) document.querySelector(".template-wrapper .template:last-child a").href = devLink.value;
 };
 
 /* Web3Forms submit */
@@ -263,4 +308,3 @@ if(web3Form){
 
 </body>
 </html>
-
