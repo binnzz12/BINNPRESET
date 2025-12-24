@@ -1,113 +1,99 @@
-/* ===============================
-   DEV MODE + TEMPLATE PERSIST
-=============================== */
-let clickCount = 0;
-let clickTimeout;
+let currentImageUrl = "";
 
-const logo = document.getElementById("logo");
-const devPanel = document.getElementById("devPanel");
-const saveEdit = document.getElementById("saveEdit");
-const templateWrapper = document.getElementById("templateWrapper");
+// Isi input dari tag
+function fillInput(text) {
+    document.getElementById("textInput").value = text;
+}
 
-// Klik logo 5x untuk Dev Mode
-logo.onclick = () => {
-    clickCount++;
-    if (clickCount === 1) clickTimeout = setTimeout(() => clickCount = 0, 2000);
-    if (clickCount === 5) {
-        clearTimeout(clickTimeout);
-        clickCount = 0;
-        const key = prompt("Masukkan kunci developer");
-        if (btoa(key) === "YmlubnByc3Q=") { // "binnprst"
-            localStorage.setItem("DEV", "1");
-            document.body.classList.add("dev");
-            alert("Developer Mode aktif!");
-        } else alert("Akses ditolak");
+// Generate gambar
+function generateImage() {
+    const input = document.getElementById("textInput");
+    const btnGenerate = document.getElementById("generateBtn");
+    const btnDownload = document.getElementById("downloadBtn");
+    const img = document.getElementById("resultImage");
+    const loader = document.getElementById("loader");
+    const placeholder = document.getElementById("placeholder");
+    const container = document.getElementById("resultContainer");
+
+    const text = input.value.trim();
+    if (!text) {
+        input.focus();
+        return;
     }
-};
 
-// Jika Dev Mode pernah aktif sebelumnya
-if (localStorage.getItem("DEV")) document.body.classList.add("dev");
+    // UI loading
+    btnGenerate.disabled = true;
+    btnGenerate.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> CREATING...';
+    btnDownload.style.display = "none";
+    img.style.display = "none";
+    placeholder.style.display = "none";
+    loader.style.display = "block";
+    container.classList.remove("active");
 
-// Fungsi menyimpan template baru
-function saveTemplate(title, videoUrl, presetLink) {
-    let templates = JSON.parse(localStorage.getItem("templates") || "[]");
-    templates.push({ title, videoUrl, presetLink });
-    localStorage.setItem("templates", JSON.stringify(templates));
-    renderTemplates();
+    const apiUrl = `https://api.ryzumi.vip/api/image/iqc?text=${encodeURIComponent(text)}`;
+
+    const tempImg = new Image();
+    tempImg.crossOrigin = "Anonymous";
+    tempImg.src = apiUrl;
+
+    tempImg.onload = () => {
+        img.src = apiUrl;
+        currentImageUrl = apiUrl;
+
+        loader.style.display = "none";
+        img.style.display = "block";
+        container.classList.add("active");
+
+        btnGenerate.disabled = false;
+        btnGenerate.innerHTML = '<i class="fas fa-sync"></i> RE-GENERATE';
+        btnDownload.style.display = "flex";
+    };
+
+    tempImg.onerror = () => {
+        loader.style.display = "none";
+        placeholder.style.display = "block";
+        placeholder.innerHTML = `
+            <i class="fas fa-exclamation-triangle"></i>
+            <p style="color:#ef4444">Connection Failed</p>
+        `;
+
+        btnGenerate.disabled = false;
+        btnGenerate.innerHTML = '<i class="fas fa-redo"></i> RETRY';
+    };
 }
 
-// Fungsi render template dari localStorage
-function renderTemplates() {
-    let templates = JSON.parse(localStorage.getItem("templates") || "[]");
-    templateWrapper.innerHTML = "";
-    templates.forEach(t => {
-        const div = document.createElement("div");
-        div.className = "template";
+// Download gambar
+async function downloadImage() {
+    if (!currentImageUrl) return;
 
-        const video = document.createElement("video");
-        video.src = t.videoUrl;
-        video.controls = true;
-        div.appendChild(video);
+    const btn = document.getElementById("downloadBtn");
+    const originalText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SAVING...';
 
-        const titleEl = document.createElement("div");
-        titleEl.className = "template-title";
-        titleEl.textContent = t.title;
-        div.appendChild(titleEl);
+    try {
+        const response = await fetch(currentImageUrl);
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
 
-        const linkEl = document.createElement("a");
-        linkEl.href = t.presetLink;
-        linkEl.target = "_blank";
-        linkEl.textContent = "Buka Preset";
-        div.appendChild(linkEl);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `IQC_IMAGE_${Date.now()}.png`;
+        document.body.appendChild(a);
+        a.click();
 
-        templateWrapper.appendChild(div);
-    });
+        URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    } catch {
+        window.open(currentImageUrl, "_blank");
+    } finally {
+        btn.innerHTML = originalText;
+    }
 }
 
-// Load template saat halaman dibuka
-window.onload = () => {
-    renderTemplates();
-};
-
-// Event Dev Panel: tambah template
-saveEdit.onclick = () => {
-    if (!confirm("Tambahkan template baru?")) return;
-    const url = document.getElementById("devVideoUrl").value.trim();
-    const title = document.getElementById("devTitle").value.trim();
-    const link = document.getElementById("devLink").value.trim();
-    if (!url || !title || !link) { alert("Semua kolom harus diisi!"); return; }
-    saveTemplate(title, url, link);
-
-    // Reset input
-    document.getElementById("devVideoUrl").value = "";
-    document.getElementById("devTitle").value = "";
-    document.getElementById("devLink").value = "";
-};
-
-/* ===============================
-   CONTACT FORM WEB3
-=============================== */
-const web3Form = document.getElementById('web3ContactForm');
-const formResponse = document.getElementById('formResponse');
-
-if (web3Form) {
-    web3Form.addEventListener('submit', async (e) => {
+// Enter untuk generate
+document.getElementById("textInput").addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
         e.preventDefault();
-        const formData = new FormData(web3Form);
-        try {
-            const res = await fetch(web3Form.action, { method: "POST", body: formData });
-            const data = await res.json();
-            if (data.success) {
-                formResponse.textContent = "✅ Pesan berhasil dikirim!";
-                formResponse.style.display = "block";
-                web3Form.reset();
-            } else {
-                formResponse.textContent = "❌ Terjadi kesalahan, coba lagi!";
-                formResponse.style.display = "block";
-            }
-        } catch (err) {
-            formResponse.textContent = "❌ Network error, cek koneksi!";
-            formResponse.style.display = "block";
-        }
-    });
-}
+        generateImage();
+    }
+});
